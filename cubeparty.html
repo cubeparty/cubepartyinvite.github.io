@@ -1,0 +1,71 @@
+<!doctype html>
+<html>
+	<head>
+		<title>CubeParty Invite</title>
+		<meta charset="utf-8">
+		<meta name="viewport" content="width=device-width, user-scalable=no, minimum-scale=1.0, maximum-scale=1.0">
+		<META HTTP-EQUIV="CACHE-CONTROL" CONTENT="NO-CACHE">
+		
+		<!-- libs -->
+		<script src="lib/three.min.js"></script>
+		<script src="lib/Detector.js"></script>
+		<script src='lib/threex.windowresize.js'></script>
+		<script src='lib/threex.atmospherematerial.js'></script>
+		<script src='lib/threex.atmospherematerialdatgui.js'></script>
+		<script src='lib/threex.dilategeometry.js'></script>
+		<script src='lib/threex.geometricglowmesh.js'></script>
+		<script src="lib/soundmanager2-nodebug-jsmin.js"></script>
+		<script src="lib/Stats.js"></script>
+		<!-- src -->
+		<script src="src/cubeparty.js"></script>
+		<script src="src/loadinganim.js"></script>
+		<script src="src/triangle.js"></script>
+		<!-- css -->
+		<style type="text/css">
+		html {
+			cursor: none;
+		}
+		body {
+			overflow	: hidden;
+			padding		: 0;
+			margin		: 0;
+
+			color		: #000;
+			background-color: #000;
+			font-family	: font-family: Monospace;
+			font-size	: 100%;
+		}
+		#info .top {
+			position	: absolute;
+			top		: 0px;
+			width		: 100%;
+			padding		: 5px;
+			text-align	: center;
+		}
+		#info a {
+			color		: #66F;
+			text-decoration	: none;
+		}
+		#info a:hover {
+			text-decoration	: underline;
+		}
+		#info .bottom {
+			position	: absolute;
+			bottom		: 0px;
+			right		: 5px;
+			padding		: 5px;
+		}
+		#info h2 {
+			color		: white
+		}
+		</style>
+	</head>
+<body>
+    	<div id="container"></div>
+	<script type="text/javascript">
+		var stats, scene, renderer;
+		var camera, gameTime=0, timeLine = [], effects = [];
+		init();
+	</script>
+</body>
+</html>
