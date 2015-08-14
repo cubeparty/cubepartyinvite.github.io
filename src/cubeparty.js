@@ -5,13 +5,15 @@ var creatingScene = true;
 var LoadingAnim;
 var musicControl;
 var maxJitter = 1200; // ms
+var startOffset = 0;
+var startTimeAbsolute;
+var startTimeGameTime;
+var frameRateLimit = 60;
 
 function init() {
 	'use strict'
 	if (Detector.webgl) {
-		renderer = new THREE.WebGLRenderer({
-			antialias		: true,	// to get smoother output
-		});
+		renderer = new THREE.WebGLRenderer({antialias:false,});
 		renderer.autoClearColor = 0x000000;
 		renderer.autoClear = true;
 	} else {
@@ -22,7 +24,6 @@ function init() {
 	document.getElementById('container').appendChild(renderer.domElement);
 	
 	scene = new THREE.Scene();
-//	scene.fog = new THREE.FogExp2(0x000000, 0);
 
 	// put a camera in the scene
 	camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 10000);
@@ -30,9 +31,8 @@ function init() {
 	camera.lookAt(scene.position);
 	scene.add(camera);
 	
-	// transparently support window resize
 	THREEx.WindowResize.bind(renderer, camera);
-	setTimeout("LoadingAnim.show();animate();console.log('Loading aninm show');", 500);
+	setTimeout("LoadingAnim.show();animate();console.log('Loading started');", 500);
 	setTimeout("createScene();", 1000);
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -45,25 +45,21 @@ function init() {
 	loadingOn = true;
 	musicOn = false;
 	creatingScene = true;
-	
 	effects.push(LoadingAnim);
+	console.log('Loading animation initialized');
 	timeLine.push(0); // Demo start time
-	timeLine.push(maxJitter); // Demo jitter tolerance
+	timeLine.push(effects[0].effectLength); // Minimum loading time
 }
 
 function musicReady() {
 	'use strict'
+	console.log('Music ready at ' + gameTime)
 	loadingOn = false;
 }
 
 function pushTime(mseconds) {
 	previous = 0;
 	previous = timeLine[timeLine.length - 1];
-/*	if (timeLine.length > 1) {
-		previous = timeLine[timeLine.length - 1];
-	} else {
-		timeLine.push(0);
-	}*/
 	timeLine.push(previous + mseconds);
 }
 
@@ -79,47 +75,52 @@ function createScene() {
 		url: 'res/jam.mp3'
 	});
 
-	effects.push(createTriangle());
+	// Push effects to display list
+	effects.push(createTriangle(0xffaffa));
+	effects.push(createTriangle(0x00fafa));
+	// ---
 	
 	var enabledEffects = effects.filter(function(el,ind,arr) {
-			return el.enabled === true; } 
+			return el.enabled === true; }
 		);
 	effects = enabledEffects;
+	
+	// Setup timeline. Length is additive to previous effect endTime
 	for (var i = 1; i < effects.length; ++i) {
 		pushTime(effects[i].effectLength);
 	}
-	console.log(timeLine);
 	creatingScene = false;
 }
 
 function animate(timestamp) {
 'use strict'
-	requestAnimationFrame(animate);
+	requestAnimationFrame(animate); // Tries to animate at least 60fps
 
 	if (timeLine.length > 1) {
 		var startTime = timeLine[0];
-		var endTime = timeLine[1];
-		if (endTime > gameTime) { // Jitter buffer and minimum load time is bigger than gametime.. mandatory loading anim running time
+		var endTime = timeLine[1]; // we chop effect from end without offset
+		if (endTime > gameTime) { // Default effect running loop
 			effects[0].update(gameTime - startTime);
-		} else {
-			if (loadingOn || creatingScene) {  // loading still going bit max time crossed
-				effects[0].update(gameTime - startTime);
-				endTime = gameTime; // Sets the jitter for next effect start time
-			} else {
-				startTime = endTime;
-				effects[0].hide();
-				timeLine.shift(); // Shift starting time to next effect
+		} else { // endTime passed, time to shift effect
+			startOffset = gameTime - endTime; // Recalculate start offset
+			if (loadingOn || creatingScene) {  // Special case for slow loading of resources
+				effects[0].update(gameTime);
+			} else { // endTime passed and time to shift effect
+				var startTime = endTime + startOffset; // Start effect from zero
+				effects[0].hide(); // Hide current effect
+				timeLine.shift(); // Shift to next effect
 				effects.shift();
 				if (timeLine.length > 1) {
 					effects[0].show();
-					effects[0].update(gameTime - startTime);
+					effects[0].update(gameTime - startTime); // Init scene with local gameTime 0
 					if (!musicOn && !loadingOn && !creatingScene) {
-						// Demo starts
+						// Scene loaded, time to start demo
 						musicControl.play();
+						startTimeAbsolute = timestamp;
+						startTimeGameTime = gameTime;
 						musicOn = true;
 					}
 				} else {
-					console.log("exit"); console.log(musicControl.position-gameTime);
 					musicControl.stop(); // Please make it stop
 					musicOn = false;
 					setTimeout("window.close()", 4000);
@@ -130,12 +131,7 @@ function animate(timestamp) {
 	render();
 	gameTime++;
 	stats.update();
-	if (musicOn) {
-		var realTime = Math.ceil(maxJitter + musicControl.position); // Skip ticks if music aheads more than maxJitter
-		if (gameTime < realTime) {
-			gameTime = realTime;
-		}
-	}
+	// Todo frame rate lock to frameRateLimit
 }
 
 function render() {

@@ -3,6 +3,8 @@ function createLoadingAnim() {
 'use strict'
 	var obj = {};
 	obj.enabled = true;
+	obj.effectLength = 200; // gameTime
+	console.log("Loading animation initializing");
 	var tickInterval = 10;
 	var tickCount = 0, numOfTicks = 20;
 	var startDelay = 30;
