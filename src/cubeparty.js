@@ -9,6 +9,7 @@ var startOffset = 0;
 var startTimeAbsolute;
 var startTimeGameTime;
 var frameRateLimit = 60;
+var musicUrl = 'res/jam.mp3';
 
 function init() {
 	'use strict'
@@ -40,6 +41,17 @@ function init() {
 	stats.domElement.style.top = '0px';
 
 	document.body.appendChild( stats.domElement );
+
+	loadingManager = new THREE.LoadingManager();
+	loadingManager.onProgress = function ( item, loaded, total ) {
+		console.log( item, loaded, total );
+		if (total === 0) loadingOn = false;
+	};
+	loadingManager.onLoad = function() {
+		console.log('resources loaded in ' + gameTime);
+		loadingOn = false;
+	}
+	
 	LoadingAnim = createLoadingAnim();
 
 	loadingOn = true;
@@ -54,7 +66,7 @@ function init() {
 function musicReady() {
 	'use strict'
 	console.log('Music ready at ' + gameTime)
-	loadingOn = false;
+	loadingManager.itemEnd(musicUrl);
 }
 
 function pushTime(mseconds) {
@@ -71,8 +83,9 @@ function createScene() {
 			musicReady();
 		}
 	});
+	loadingManager.itemStart(musicUrl);
 	musicControl = soundManager.createSound({
-		url: 'res/jam.mp3'
+		url: musicUrl
 	});
 
 	// Push effects to display list
