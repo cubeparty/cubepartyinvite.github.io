@@ -1,4 +1,4 @@
-// Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
+'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
 var loadingOn = true;
 var musicOn = false;
 var creatingScene = true;
@@ -10,9 +10,9 @@ var startTimeAbsolute;
 var startTimeGameTime;
 var frameRateLimit = 60;
 var musicUrl = 'res/jam.mp3';
+var soundVolume = 0;  // for debugging 
 
 function init() {
-	'use strict'
 	if (Detector.webgl) {
 		renderer = new THREE.WebGLRenderer({antialias:false,});
 		renderer.autoClearColor = 0x000000;
@@ -76,7 +76,6 @@ function pushTime(mseconds) {
 }
 
 function createScene() {
-'use strict'
 	soundManager.setup({
 		url: '',
 		onready: function() {
@@ -85,9 +84,12 @@ function createScene() {
 	});
 	loadingManager.itemStart(musicUrl);
 	musicControl = soundManager.createSound({
-		url: musicUrl
+		url: musicUrl,
+		volume: soundVolume,
 	});
-
+//
+createTriangle.oops = true;
+console.log(createTriangle);
 	// Push effects to display list
 	effects.push(createTriangle(0xffaffa));
 	effects.push(createTriangle(0x00fafa));
@@ -106,7 +108,6 @@ function createScene() {
 }
 
 function animate(timestamp) {
-'use strict'
 	requestAnimationFrame(animate); // Tries to animate at least 60fps
 
 	if (timeLine.length > 1) {
@@ -144,10 +145,8 @@ function animate(timestamp) {
 	render();
 	gameTime++;
 	stats.update();
-	// Todo frame rate lock to frameRateLimit
 }
 
 function render() {
-'use strict'
-	renderer.render( scene, camera );
+	renderer.render(scene, camera);
 }
