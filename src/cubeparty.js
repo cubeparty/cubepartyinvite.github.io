@@ -70,7 +70,7 @@ function musicReady() {
 }
 
 function pushTime(mseconds) {
-	previous = 0;
+	var previous = 0;
 	previous = timeLine[timeLine.length - 1];
 	timeLine.push(previous + mseconds);
 }
