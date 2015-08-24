@@ -1,6 +1,5 @@
-// Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
+'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
 function createLoadingAnim() {
-'use strict'
 	var obj = {};
 	obj.enabled = true;
 	obj.effectLength = 200; // gameTime

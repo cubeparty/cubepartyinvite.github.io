@@ -1,6 +1,5 @@
-// Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
+'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
 function createTriangle(argColor) {
-'use strict'
 	var obj = {};
 	obj.rootObject = new THREE.Object3D();
 	obj.enabled = true;

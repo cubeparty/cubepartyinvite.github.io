@@ -64,7 +64,6 @@ function init() {
 }
 
 function musicReady() {
-	'use strict'
 	console.log('Music ready at ' + gameTime)
 	loadingManager.itemEnd(musicUrl);
 }
