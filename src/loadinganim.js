@@ -26,6 +26,7 @@ function createLoadingAnim() {
 	
 	obj.hide = function() {
 		scene.remove(glowCylinder.object3d);
+		glowCylinder.object3d = null;
 	}
 	
 	obj.update = function(currentTime) {

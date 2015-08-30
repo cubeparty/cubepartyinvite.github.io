@@ -87,11 +87,9 @@ function createScene() {
 		volume: soundVolume,
 	});
 //
-createTriangle.oops = true;
-console.log(createTriangle);
 	// Push effects to display list
-	effects.push(createTriangle(0xffaffa));
-	effects.push(createTriangle(0x00fafa));
+	effects.push(createTriangle('blueknot', 0xffaffa));
+	effects.push(createTriangle('redknot', 0x00fafa));
 	// ---
 	
 	var enabledEffects = effects.filter(function(el,ind,arr) {
@@ -100,7 +98,15 @@ console.log(createTriangle);
 	effects = enabledEffects;
 	
 	// Setup timeline. Length is additive to previous effect endTime
+	tlMain = new TimelineLite({
+		paused: true,
+		useFrames: false,
+		});
 	for (var i = 1; i < effects.length; ++i) {
+		if (effects[i].timeline != null) {
+			tlMain.append(effects[i].timeline);
+			console.log('timeline added to main');
+		 }
 		pushTime(effects[i].effectLength);
 	}
 	creatingScene = false;
@@ -108,8 +114,10 @@ console.log(createTriangle);
 
 function animate(timestamp) {
 	requestAnimationFrame(animate); // Tries to animate at least 60fps
-
-	if (timeLine.length > 1) {
+	if (effects[0].timeline != null) { // TimelineLite loops here, rest is homegrown frame based timeline used in loading animation.
+		render();
+		return;
+	} else if (timeLine.length > 1) {
 		var startTime = timeLine[0];
 		var endTime = timeLine[1]; // we chop effect from end without offset
 		if (endTime > gameTime) { // Default effect running loop
@@ -120,18 +128,19 @@ function animate(timestamp) {
 				effects[0].update(gameTime);
 			} else { // endTime passed and time to shift effect
 				var startTime = endTime + startOffset; // Start effect from zero
-				effects[0].hide(); // Hide current effect
+				effects[0].hide(); // Hide current effect.
 				timeLine.shift(); // Shift to next effect
 				effects.shift();
 				if (timeLine.length > 1) {
-					effects[0].show();
-					effects[0].update(gameTime - startTime); // Init scene with local gameTime 0
+					effects[0].show && effects[0].show(); // TimelineLite manages show/update itsef
+					effects[0].update && effects[0].update(gameTime - startTime); // Init scene with local gameTime 0
 					if (!musicOn && !loadingOn && !creatingScene) {
-						// Scene loaded, time to start demo
+						console.log('Scene loaded, time to start demo');
 						musicControl.play();
 						startTimeAbsolute = timestamp;
 						startTimeGameTime = gameTime;
 						musicOn = true;
+						tlMain.play(0);
 					}
 				} else {
 					musicControl.stop(); // Please make it stop
@@ -142,10 +151,10 @@ function animate(timestamp) {
 		}
 	}
 	render();
-	gameTime++;
-	stats.update();
 }
 
 function render() {
 	renderer.render(scene, camera);
+	gameTime++;
+	stats.update();
 }
