@@ -51,6 +51,12 @@ function init() {
 		console.log('resources loaded in ' + gameTime);
 		loadingOn = false;
 	}
+
+	// Setup timeline. Length is additive to previous effect endTime
+	tlMain = new TimelineLite({
+		paused: true,
+		useFrames: false,
+		});
 	
 	LoadingAnim = createLoadingAnim();
 
@@ -97,11 +103,6 @@ function createScene() {
 		);
 	effects = enabledEffects;
 	
-	// Setup timeline. Length is additive to previous effect endTime
-	tlMain = new TimelineLite({
-		paused: true,
-		useFrames: false,
-		});
 	for (var i = 1; i < effects.length; ++i) {
 		if (effects[i].timeline != null) {
 			tlMain.append(effects[i].timeline);
