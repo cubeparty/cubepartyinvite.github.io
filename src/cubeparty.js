@@ -81,6 +81,8 @@ function pushTime(mseconds) {
 }
 
 function createScene() {
+	loadingManager.itemStart('createScene');
+
 	soundManager.setup({
 		url: '',
 		onready: function() {
@@ -103,14 +105,25 @@ function createScene() {
 		);
 	effects = enabledEffects;
 	
+	var tlMainTotalDuration = null;
 	for (var i = 1; i < effects.length; ++i) {
 		if (effects[i].timeline != null) {
-			tlMain.append(effects[i].timeline);
+			tlScenes.push(effects[i].timeline);
+			tlMainTotalDuration += tlScenes[0].totalDuration();
 			console.log('timeline added to main');
 		 }
 		pushTime(effects[i].effectLength);
 	}
+
+// Setup control timeline
+	if (tlMainTotalDuration) {
+		tlMain.set(scene, {visible:true}, "0");
+		tlMain.call(function(){tlScenes[0].play()}, null, null, "0");
+		tlMain.call(function(){tlScenes[1].play()}, null, null, "2");
+	}
+
 	creatingScene = false;
+	loadingManager.itemEnd('createScene');
 }
 
 function animate(timestamp) {
@@ -141,6 +154,7 @@ function animate(timestamp) {
 						startTimeAbsolute = timestamp;
 						startTimeGameTime = gameTime;
 						musicOn = true;
+//						tlScenes.forEach(function(cur,ind,arr,thisArg) { cur.play(0); });
 						tlMain.play(0);
 					}
 				} else {

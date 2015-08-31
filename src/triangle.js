@@ -11,8 +11,7 @@ function createTriangle(label, argColor) {
 	obj.effectLength = createTriangle.effectLength,
 	obj.rootObject = new THREE.Object3D();
 	obj.timeline = new TimelineLite({
-			paused:false,
-//			immediateRender: false,
+			paused:true,
 			callbackScope: obj,
 //			get updateCallback() { return obj.updateCb; },
 			get onComplete() { return obj.hideCb; },
@@ -33,7 +32,9 @@ function createTriangle(label, argColor) {
 	obj.rootObject.visible = false;
 	scene.add(obj.rootObject);
 	obj.showCb = function() {
-//	console.timeStamp('EFFSHOW');
+		obj.rootObject.visible = true;
+		obj.timeline.play();
+		console.log('EFFSHOW');
 	}
 
 	obj.hideCb = function() {
@@ -55,7 +56,7 @@ function createTriangle(label, argColor) {
 
 	obj.timeline.addLabel(startLabel);
 // labels do not propagate to parent, tlMain.call cant be called with labels
-	obj.timeline.set(obj.rootObject, {visible:true, immediateRender:false});
+//	obj.timeline.set(obj.rootObject, {visible:true, immediateRender:false});
 	obj.timeline.to(torusKnot.rotation, 2.0, {x: 6.28, y: 6.28});
 	obj.timeline.set(obj.rootObject, {visible:false});
 	obj.timeline.addLabel(completedLabel);
