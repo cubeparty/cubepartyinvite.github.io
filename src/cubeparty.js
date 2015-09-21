@@ -33,8 +33,6 @@ function init() {
 	scene.add(camera);
 	
 	THREEx.WindowResize.bind(renderer, camera);
-//	setTimeout("LoadingAnim.show();animate();console.log('Loading started');", 500);
-	setTimeout("createScene();", 1000);
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
 	stats.domElement.style.left = '0px';
@@ -51,7 +49,6 @@ function init() {
 		console.log('resources loaded in ' + gameTime);
 		loadingOn = false;
 	}
-
 	// Setup timeline. Length is additive to previous effect endTime
 	tlMain = new TimelineLite({
 		paused: true,
@@ -72,12 +69,6 @@ function musicReady() {
 	loadingManager.itemEnd(musicUrl);
 }
 
-function pushTime(mseconds) {
-	var previous = 0;
-	previous = timeLine[timeLine.length - 1];
-	timeLine.push(previous + mseconds);
-}
-
 function createScene() {
 	loadingManager.itemStart('createScene');
 
@@ -92,32 +83,31 @@ function createScene() {
 		url: musicUrl,
 		volume: soundVolume,
 	});
-//
+
 	// Push effects to display list
 	effects.push(createTriangle('blueknot', 0xffaffa));
 	effects.push(createTriangle('redknot', 0x00fafa));
 	// ---
-	
+
 	var enabledEffects = effects.filter(function(el,ind,arr) {
 			return el.enabled === true; }
 		);
 	effects = enabledEffects;
-	
+
 	var tlMainTotalDuration = null;
-	for (var i = 1; i < effects.length; ++i) {
+	for (var i = 0; i < effects.length; ++i) {
 		if (effects[i].timeline != null) {
 			tlScenes.push(effects[i].timeline);
 			tlMainTotalDuration += tlScenes[0].totalDuration();
-			console.log('timeline added to main');
-		 }
-		pushTime(effects[i].effectLength);
+			console.log('timeline added to main:' + i);
+		 } else console.log('timeline null for effect: ' + i);
 	}
 
 // Setup control timeline
 	if (tlMainTotalDuration) {
 		tlMain.set(scene, {visible:true}, "0");
-		tlMain.call(function(){tlScenes[1].play()}, null, null, "0");
-		tlMain.call(function(){tlScenes[2].play()}, null, null, "2");
+		tlMain.call(function(){tlScenes[0].play()}, null, null, "0");
+		tlMain.call(function(){tlScenes[1].play()}, null, null, "2");
 	}
 
 	creatingScene = false;
@@ -130,48 +120,4 @@ function startShow() {
 function animate(timestamp) {
 	requestAnimationFrame(animate); // Tries to animate at least 60fps
 	renderer.render(scene, camera);
-/*	if (effects[0].timeline != null) { // TimelineLite loops here, rest is homegrown frame based timeline used in loading animation.
-		render();
-		return;
-	} else if (timeLine.length > 1) {
-		var startTime = timeLine[0];
-		var endTime = timeLine[1]; // we chop effect from end without offset
-		if (endTime > gameTime) { // Default effect running loop
-			effects[0].update(gameTime - startTime);
-		} else { // endTime passed, time to shift effect
-			startOffset = gameTime - endTime; // Recalculate start offset
-			if (loadingOn || creatingScene) {  // Special case for slow loading of resources
-				effects[0].update(gameTime);
-			} else { // endTime passed and time to shift effect
-				var startTime = endTime + startOffset; // Start effect from zero
-				effects[0].hide(); // Hide current effect.
-				timeLine.shift(); // Shift to next effect
-				effects.shift();
-				if (timeLine.length > 1) {
-					effects[0].show && effects[0].show(); // TimelineLite manages show/update itsef
-					effects[0].update && effects[0].update(gameTime - startTime); // Init scene with local gameTime 0
-					if (!musicOn && !loadingOn && !creatingScene) {
-						console.log('Scene loaded, time to start demo');
-						musicControl.play();
-						startTimeAbsolute = timestamp;
-						startTimeGameTime = gameTime;
-						musicOn = true;
-//						tlScenes.forEach(function(cur,ind,arr,thisArg) { cur.play(0); });
-						tlMain.play(0);
-					}
-				} else {
-					musicControl.stop(); // Please make it stop
-					musicOn = false;
-					setTimeout("window.close()", 4000);
-				}
-			}
-		}
-	}
-*/ 
-}
-
-function render() {
-	renderer.render(scene, camera);
-	gameTime++;
-	stats.update();
 }
