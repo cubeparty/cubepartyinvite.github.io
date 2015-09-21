@@ -33,7 +33,7 @@ function init() {
 	scene.add(camera);
 	
 	THREEx.WindowResize.bind(renderer, camera);
-	setTimeout("LoadingAnim.show();animate();console.log('Loading started');", 500);
+//	setTimeout("LoadingAnim.show();animate();console.log('Loading started');", 500);
 	setTimeout("createScene();", 1000);
 	stats = new Stats();
 	stats.domElement.style.position = 'absolute';
@@ -58,15 +58,13 @@ function init() {
 		useFrames: false,
 		});
 	
-	LoadingAnim = createLoadingAnim();
-
 	loadingOn = true;
 	musicOn = false;
 	creatingScene = true;
-	effects.push(LoadingAnim);
-	console.log('Loading animation initialized');
-	timeLine.push(0); // Demo start time
-	timeLine.push(effects[0].effectLength); // Minimum loading time
+	LoadingAnim = createLoadingAnim({onCompleted:startShow});
+	console.log('Loading animation started');
+	animate();
+	createScene();
 }
 
 function musicReady() {
@@ -118,17 +116,21 @@ function createScene() {
 // Setup control timeline
 	if (tlMainTotalDuration) {
 		tlMain.set(scene, {visible:true}, "0");
-		tlMain.call(function(){tlScenes[0].play()}, null, null, "0");
-		tlMain.call(function(){tlScenes[1].play()}, null, null, "2");
+		tlMain.call(function(){tlScenes[1].play()}, null, null, "0");
+		tlMain.call(function(){tlScenes[2].play()}, null, null, "2");
 	}
 
 	creatingScene = false;
 	loadingManager.itemEnd('createScene');
 }
+function startShow() {
+	tlMain.play(0);
+}
 
 function animate(timestamp) {
 	requestAnimationFrame(animate); // Tries to animate at least 60fps
-	if (effects[0].timeline != null) { // TimelineLite loops here, rest is homegrown frame based timeline used in loading animation.
+	renderer.render(scene, camera);
+/*	if (effects[0].timeline != null) { // TimelineLite loops here, rest is homegrown frame based timeline used in loading animation.
 		render();
 		return;
 	} else if (timeLine.length > 1) {
@@ -165,7 +167,7 @@ function animate(timestamp) {
 			}
 		}
 	}
-	render();
+*/ 
 }
 
 function render() {

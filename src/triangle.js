@@ -13,7 +13,7 @@ function createTriangle(label, argColor) {
 	obj.timeline = new TimelineLite({
 			paused:true,
 			callbackScope: obj,
-//			get updateCallback() { return obj.updateCb; },
+			updateCallback: function() { obj.updateCb(); },
 			get onComplete() { return obj.hideCb; },
 			get onStart() { return obj.showCb; },
 			});

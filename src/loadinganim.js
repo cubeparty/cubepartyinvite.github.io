@@ -1,5 +1,5 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
-function createLoadingAnim() {
+function createLoadingAnim(params) {
 	var obj = {};
 	obj.enabled = true;
 	obj.effectLength = 200; // gameTime
@@ -20,32 +20,37 @@ function createLoadingAnim() {
 	outGlowUniforms.glowColor.value.set(0x603000);
 
 	var reset = true;
-	obj.show = function() {
+	obj.showCb = function() {
+		console.log('show loading anim');
 		scene.add(glowCylinder.object3d);
 	}
 	
-	obj.hide = function() {
+	obj.restartCb = function() {
+		if (loadingOn === true) {
+			obj.timeline.seek('startcycle');
+		} else {
+			obj.hideCb();
+			params.onCompleted();
+		}
+	}
+	
+	obj.hideCb = function() {
 		scene.remove(glowCylinder.object3d);
 		glowCylinder.object3d = null;
 	}
 	
-	obj.update = function(currentTime) {
-	if (currentTime < startDelay) return; // Start animation after start delay
-	else if ((currentTime + 1) % tickInterval == 0) {
-			if (reset) {
-				glowCylinder.outsideMesh.scale.x = 0;
-				glowCylinder.outsideMesh.scale.y = 0.3;
-				outGlowUniforms.glowColor.value.set(0x600000);
-				reset = false;
-			}
-
-			if (++tickCount == numOfTicks) {
-				tickCount = 0;
-				reset = true;
-			} else {
-				glowCylinder.outsideMesh.scale.x = tickCount/numOfTicks;
-			}
-		}
+	obj.updateCb = function(currentTime) {
 	}
+
+	obj.timeline = new TimelineLite({
+			paused:false,
+			callbackScope: obj,
+			get onComplete() { return obj.restartCb; },
+			get onStart() { return obj.showCb; },
+			});
+			obj.timeline.add(TweenLite.set(glowCylinder.outsideMesh.scale, {x:0.001,y:0.3,},'startcycle'));
+			obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:1, onComplete:function(){console.log('tweenbig')}, onCompleteParams:['param']}), 'toendcycle');
+			obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:0.001, onComplete:function(){console.log('tweensmall')}, onCompleteParams:['param']}),'tostartcycle');			
+
 	return obj;
 }
