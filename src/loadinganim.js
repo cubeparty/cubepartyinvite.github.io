@@ -1,12 +1,7 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
 function createLoadingAnim(params) {
-	var obj = {};
-	obj.enabled = true;
-	obj.effectLength = 200; // gameTime
 	console.log("Loading animation initializing");
-	var tickInterval = 10;
-	var tickCount = 0, numOfTicks = 20;
-	var startDelay = 30;
+	var obj = {};
 	var innerMaterial = new THREE.MeshBasicMaterial();
 	var innerCylinder = new THREE.Mesh(new THREE.CylinderGeometry(80, 80, 10, 32), innerMaterial);
 	var glowCylinder = new THREEx.GeometricGlowMesh(innerCylinder);
@@ -16,15 +11,11 @@ function createLoadingAnim(params) {
 	var inGlowUniforms  = glowCylinder.insideMesh.material.uniforms;
 	inGlowUniforms.glowColor.value.set('yellow');
 	var outGlowUniforms = glowCylinder.outsideMesh.material.uniforms;
-	 
 	outGlowUniforms.glowColor.value.set(0x603000);
-
-	var reset = true;
 	obj.showCb = function() {
 		console.log('show loading anim');
 		scene.add(glowCylinder.object3d);
 	}
-	
 	obj.restartCb = function() {
 		if (loadingOn === true) {
 			obj.timeline.seek('startcycle');
@@ -33,15 +24,13 @@ function createLoadingAnim(params) {
 			params.onCompleted();
 		}
 	}
-	
 	obj.hideCb = function() {
 		scene.remove(glowCylinder.object3d);
 		glowCylinder.object3d = null;
+		obj.timeline = null;
 	}
-	
 	obj.updateCb = function(currentTime) {
 	}
-
 	obj.timeline = new TimelineLite({
 			paused:false,
 			callbackScope: obj,
@@ -49,8 +38,7 @@ function createLoadingAnim(params) {
 			get onStart() { return obj.showCb; },
 			});
 			obj.timeline.add(TweenLite.set(glowCylinder.outsideMesh.scale, {x:0.001,y:0.3,},'startcycle'));
-			obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:1, onComplete:function(){console.log('tweenbig')}, onCompleteParams:['param']}), 'toendcycle');
-			obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:0.001, onComplete:function(){console.log('tweensmall')}, onCompleteParams:['param']}),'tostartcycle');			
-
+			obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:1,}));
+			obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:0.001,}));
 	return obj;
 }
