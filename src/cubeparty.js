@@ -1,9 +1,6 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
 var loadingOn = true;
-var musicOn = false;
-var creatingScene = true;
 var disableSound = true;
-var LoadingAnim;
 var musicControl;
 var musicUrl = 'res/jam.mp3';
 var soundVolume = disableSound ? 0 : 100;
@@ -16,7 +13,22 @@ function init() {
 		Detector.addGetWebGLMessage();
 		return true;
 	}
-	loadingManager = new THREE.LoadingManager();
+	loadingManager = new THREE.LoadingManager(
+		function() { // onLoad
+			console.log('All resources loaded, ready to rock \\m/');
+			debugger;
+			loadingOn = false; 
+		},
+		function (item, loaded, total) { // onProgress
+			console.log('Completed ' + item, loaded + '/' + total);
+		},
+		function () { // onError
+			console.error('Failed to load resources');
+		}
+	);
+	
+	loadingManager.onLoad = 
+	loadingManager.itemStart('init');
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 10000);
 	stats = new Stats();
@@ -30,44 +42,48 @@ function init() {
 	stats.domElement.style.position = 'absolute';
 	stats.domElement.style.left = '0px';
 	stats.domElement.style.top = '0px';
-	document.body.appendChild( stats.domElement );	
-	loadingManager.onProgress = function ( item, loaded, total ) {
-		console.log( item, loaded, total );
-		if (total === 0) loadingOn = false;
-	};
-	loadingManager.onLoad = function() {
-		console.log('resources loaded in ' + gameTime);
-		loadingOn = false;
-	}
-	// Setup timeline. Length is additive to previous effect endTime
+	document.body.appendChild( stats.domElement );
 	tlMain = new TimelineLite({
 		paused: true,
 		useFrames: false,
 		});
-	loadingOn = true;
-	musicOn = false;
-	creatingScene = true;
-	LoadingAnim = createLoadingAnim({onCompleted:startShow});
-	console.log('Loading animation started');
+	loadingManager.itemStart('loadingAnim');
+	var LoadingAnim = createLoadingAnim({
+		onCompleted:startShow,
+		get loading() { return loadingOn; }
+	});
 	animate();
 	createScene();
+	loadingManager.itemEnd('init');
+}
+function soundManagerReady() {
+	loadingManager.itemEnd('SoundManager');
+	loadingManager.itemStart(musicUrl);
+	if (!soundManager.canPlayURL(musicUrl)) {
+		console.error('Music format error on ' + musicUrl);
+	}
+	musicControl = soundManager.createSound({
+		url: musicUrl,
+		volume: soundVolume,
+		autoLoad: true,
+		autoPlay: false,
+		onLoad: musicReady,
+	});
 }
 function musicReady() {
-	console.log('Music ready');
+	console.log('Music ready', musicControl);
 	loadingManager.itemEnd(musicUrl);
 }
 function createScene() {
 	loadingManager.itemStart('createScene');
+	loadingManager.itemStart('SoundManager');
 	soundManager.setup({
 		url: '',
 		onready: function() {
-			musicReady();
-		}
-	});
-	loadingManager.itemStart(musicUrl);
-	musicControl = soundManager.createSound({
-		url: musicUrl,
-		volume: soundVolume,
+			soundManagerReady();
+		},
+		preferFlash: false,
+		debugMode: false,
 	});
 	// Push effects to display list
 	effects.push(createTriangle('blueknot', 0xffaffa));
@@ -77,25 +93,29 @@ function createScene() {
 			return el.enabled === true; }
 		);
 	effects = enabledEffects;
-	var tlMainTotalDuration = null;
 	for (var i = 0; i < effects.length; ++i) {
 		if (effects[i].timeline != null) {
 			tlScenes.push(effects[i].timeline);
-			tlMainTotalDuration += tlScenes[0].totalDuration();
-			console.log('timeline added to main:' + i);
 		 };
 	}
-// Setup control timeline
-	if (tlMainTotalDuration) {
-		tlMain.set(scene, {visible:true}, "0");
-		tlMain.call(function(){tlScenes[0].play()}, null, null, "0");
-		tlMain.call(function(){tlScenes[1].play()}, null, null, "2");
-	}
-	creatingScene = false;
+	// Setup control timeline
+	tlMain.set(scene, {visible:true, immediateRender:false}, "0");
+	tlMain.call(function(){tlScenes[0].play()}, null, null, "0");
+	tlMain.call(function(){tlScenes[1].play()}, null, null, "2");
+	tlMain.call(stopShow, null, null, '+=' + tlScenes[1].endTime());
 	loadingManager.itemEnd('createScene');
 }
 function startShow() {
+	loadingManager.itemEnd('loadingAnim');
+	loadingManager.itemEnd('loading and ready to Rock');
+	musicControl.play();
 	tlMain.play(0);
+	console.log('Rock on!');
+}
+function stopShow() {
+	musicControl.stop();
+	tlMain.stop
+	console.log('Thank you for watching...');
 }
 function animate(timestamp) {
 	requestAnimationFrame(animate); // Tries to animate@60 fps

@@ -1,6 +1,5 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
-function createLoadingAnim(params) {
-	console.log("Loading animation initializing");
+function createLoadingAnim(params, loading) {
 	var obj = {};
 	var innerMaterial = new THREE.MeshBasicMaterial();
 	var innerCylinder = new THREE.Mesh(new THREE.CylinderGeometry(80, 80, 10, 32), innerMaterial);
@@ -13,11 +12,11 @@ function createLoadingAnim(params) {
 	var outGlowUniforms = glowCylinder.outsideMesh.material.uniforms;
 	outGlowUniforms.glowColor.value.set(0x603000);
 	obj.showCb = function() {
-		console.log('show loading anim');
+		console.log('Show loading animation');
 		scene.add(glowCylinder.object3d);
 	}
 	obj.restartCb = function() {
-		if (loadingOn === true) {
+		if (loading === true) {
 			obj.timeline.seek('startcycle');
 		} else {
 			obj.hideCb();
@@ -37,8 +36,8 @@ function createLoadingAnim(params) {
 			get onComplete() { return obj.restartCb; },
 			get onStart() { return obj.showCb; },
 			});
-			obj.timeline.add(TweenLite.set(glowCylinder.outsideMesh.scale, {x:0.001,y:0.3,},'startcycle'));
-			obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:1,}));
-			obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:0.001,}));
+	obj.timeline.add(TweenLite.set(glowCylinder.outsideMesh.scale, {x:0.001,y:0.3,},'startcycle'));
+	obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:1,}));
+	obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:0.001,}));
 	return obj;
 }

@@ -1,13 +1,9 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
 function createTriangle(label, argColor) {
-	var startLabel = label + 'Start';
-	var completedLabel = label + 'Completed';
+	loadingManager.itemStart(label);
 	createTriangle.enabled = true;
-	createTriangle.effectLengthSecs = 4.0; // Secs. Timeline takes care of timing/scaling. Can run also in frame mode.
-	createTriangle.effectLength = 160; // gameTime, frames, should run near 60 fps as default
 	var obj = {};
 	obj.enabled = createTriangle.enabled;
-	obj.effectLength = createTriangle.effectLength,
 	obj.rootObject = new THREE.Object3D();
 	obj.timeline = new TimelineLite({
 			paused:true,
@@ -18,7 +14,7 @@ function createTriangle(label, argColor) {
 			});
 	var geometry = new THREE.TorusKnotGeometry(100, 100, 100, 60, Math.PI * 4);
 	var materialTorus = new THREE.MeshPhongMaterial( { color: argColor, specular: 0xfa0000, emissive: 0x0a0a00, shininess: 10 } );
-	var torusKnot = new THREE.Mesh(geometry, materialTorus);	
+	var torusKnot = new THREE.Mesh(geometry, materialTorus);
 	obj.rootObject.add(torusKnot);
 	var directionalLight = new THREE.DirectionalLight(0xffaffa);
 	directionalLight.position.set(20, 20, 20).normalize();
@@ -34,20 +30,18 @@ function createTriangle(label, argColor) {
 		if (obj.rootObject === null) {
 			return;
 		} else {
-		obj.rootObject.visible = false;
-		scene.remove(obj.rootObject);
-		obj.rootObject = null;
+			obj.rootObject.visible = false;
+			scene.remove(obj.rootObject);
+			obj.rootObject = null;
 		}
 	}
 	obj.updateCb = function() {
 		// torusKnot.rotation.y += 0.1;
 		// torusKnot.rotation.x += 0.1;
-		console.log('update');
 	}
-	obj.timeline.addLabel(startLabel);
 	obj.timeline.to(torusKnot.rotation, 2.0, {x: 6.28, y: 6.28});
 	obj.timeline.set(obj.rootObject, {visible:false});
-	obj.timeline.addLabel(completedLabel);
 	// debugger;
+	loadingManager.itemEnd(label);
 	return obj;
 }
