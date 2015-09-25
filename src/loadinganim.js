@@ -4,12 +4,12 @@ function createLoadingAnim(params, loading) {
 	var innerMaterial = new THREE.MeshBasicMaterial();
 	var innerCylinder = new THREE.Mesh(new THREE.CylinderGeometry(80, 80, 10, 32), innerMaterial);
 	var glowCylinder = new THREEx.GeometricGlowMesh(innerCylinder);
+	var inGlowUniforms  = glowCylinder.insideMesh.material.uniforms;
+	var outGlowUniforms = glowCylinder.outsideMesh.material.uniforms;
 	glowCylinder.object3d.scale.x = 4.0;
 	glowCylinder.outsideMesh.scale.x = 0.999;
 	glowCylinder.outsideMesh.scale.y = 0.8;
-	var inGlowUniforms  = glowCylinder.insideMesh.material.uniforms;
 	inGlowUniforms.glowColor.value.set('yellow');
-	var outGlowUniforms = glowCylinder.outsideMesh.material.uniforms;
 	outGlowUniforms.glowColor.value.set(0x603000);
 	obj.showCb = function() {
 		console.log('Show loading animation');

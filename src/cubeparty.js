@@ -16,7 +16,6 @@ function init() {
 	loadingManager = new THREE.LoadingManager(
 		function() { // onLoad
 			console.log('All resources loaded, ready to rock \\m/');
-			debugger;
 			loadingOn = false; 
 		},
 		function (item, loaded, total) { // onProgress
@@ -26,8 +25,6 @@ function init() {
 			console.error('Failed to load resources');
 		}
 	);
-	
-	loadingManager.onLoad = 
 	loadingManager.itemStart('init');
 	scene = new THREE.Scene();
 	camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 10000);
@@ -38,7 +35,7 @@ function init() {
 	camera.position.set(0, 0, 1500);
 	camera.lookAt(scene.position);
 	scene.add(camera);
-	THREEx.WindowResize.bind(renderer, camera);	
+	THREEx.WindowResize.bind(renderer, camera);
 	stats.domElement.style.position = 'absolute';
 	stats.domElement.style.left = '0px';
 	stats.domElement.style.top = '0px';
@@ -86,8 +83,8 @@ function createScene() {
 		debugMode: false,
 	});
 	// Push effects to display list
-	effects.push(createTriangle('blueknot', 0xffaffa));
-	effects.push(createTriangle('redknot', 0x00fafa));
+	effects.push(createKnot('blueknot', 0xffaffa));
+	effects.push(createKnot('redknot', 0x00fafa));
 	// ---
 	var enabledEffects = effects.filter(function(el,ind,arr) {
 			return el.enabled === true; }
@@ -107,7 +104,7 @@ function createScene() {
 }
 function startShow() {
 	loadingManager.itemEnd('loadingAnim');
-	loadingManager.itemEnd('loading and ready to Rock');
+	loadingManager.itemEnd('initialization...');
 	musicControl.play();
 	tlMain.play(0);
 	console.log('Rock on!');
