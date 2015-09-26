@@ -13,7 +13,7 @@ function createLoadingAnim(params, loading) {
 	outGlowUniforms.glowColor.value.set(0x603000);
 	obj.showCb = function() {
 		console.log('Show loading animation');
-		scene.add(glowCylinder.object3d);
+		params.scene.add(glowCylinder.object3d);
 	}
 	obj.restartCb = function() {
 		if (loading === true) {
@@ -24,18 +24,18 @@ function createLoadingAnim(params, loading) {
 		}
 	}
 	obj.hideCb = function() {
-		scene.remove(glowCylinder.object3d);
+		params.scene.remove(glowCylinder.object3d);
 		glowCylinder.object3d = null;
 		obj.timeline = null;
 	}
 	obj.updateCb = function(currentTime) {
 	}
-	obj.timeline = new TimelineLite({
-			paused:false,
-			callbackScope: obj,
-			get onComplete() { return obj.restartCb; },
-			get onStart() { return obj.showCb; },
-			});
+	obj.timeline = new TimelineLite ({
+		paused:false,
+		callbackScope: obj,
+		get onComplete() { return obj.restartCb; },
+		get onStart() { return obj.showCb; },
+	});
 	obj.timeline.add(TweenLite.set(glowCylinder.outsideMesh.scale, {x:0.001,y:0.3,},'startcycle'));
 	obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:1,}));
 	obj.timeline.add(TweenLite.to(glowCylinder.outsideMesh.scale, 2.0, {x:0.001,}));

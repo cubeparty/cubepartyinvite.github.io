@@ -63,11 +63,24 @@
 		</style>
 	</head>
 <body>
-    	<div id="container"></div>
+    <div id="container"></div>
 	<script type="text/javascript">
-		var stats, scene, renderer, loadingManager;
-		var camera, gameTime=0, timeLine = [], effects = [], tlMain, tlScenes = [];
-		init();
+		createCubeParty(function(ctx, scn, tl) {
+			//debugger;
+			var tls = [];
+			[
+				ctx.action(createKnot('redknot', 0x00fafa)),
+				ctx.action(createKnot('blueknot', 0xffaffa)),
+			].filter(function(e) {
+				return e.enabled;
+			}).forEach(function(e) {
+				scn.add(e.rootObject);
+				tls.push(e.timeline);
+			});
+			tl.call(function() {tls[0].play()}, null, null, "0");
+			tl.call(function() {tls[1].play()}, null, null, "2");
+			tl.call(function() {stopShow(tl);}, null, null, '+=' + tls[1].endTime());
+		});
 	</script>
 </body>
 </html>

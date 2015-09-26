@@ -1,7 +1,6 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
 function createKnot(label, argColor) {
 	// Setup objects for the return.
-	loadingManager.itemStart(label);
 	createKnot.enabled = true;
 	var geometry = new THREE.TorusKnotGeometry(100, 100, 100, 60, Math.PI * 4);
 	var materialTorus = new THREE.MeshPhongMaterial( { color: argColor, specular: 0xfa0000, emissive: 0x0a0a00, shininess: 10 } );
@@ -9,6 +8,7 @@ function createKnot(label, argColor) {
 	var directionalLight = new THREE.DirectionalLight(0xffaffa);
 	// Object that will be returned.
 	var obj = {};
+	obj.label = label,
 	obj.rootObject = new THREE.Object3D();
 	obj.rootObject.add(torusKnot);
 	obj.enabled = createKnot.enabled;
@@ -22,9 +22,8 @@ function createKnot(label, argColor) {
 	directionalLight.position.set(20, 20, 20).normalize();
 	torusKnot.position.x += 100 + argColor % 100;
 	obj.rootObject.add(directionalLight);
-	obj.rootObject.visible = false;
-	scene.add(obj.rootObject);
-	obj.showCb = function() {
+	obj.rootObject.visible = false;	
+	obj.showCb = function(p) {
 		obj.rootObject.visible = true;
 		obj.timeline.play();
 	}
@@ -33,7 +32,6 @@ function createKnot(label, argColor) {
 			return;
 		} else {
 			obj.rootObject.visible = false;
-			scene.remove(obj.rootObject);
 			obj.rootObject = null;
 		}
 	}
@@ -43,7 +41,6 @@ function createKnot(label, argColor) {
 	}
 	obj.timeline.to(torusKnot.rotation, 2.0, {x: 6.28, y: 6.28});
 	obj.timeline.set(obj.rootObject, {visible:false});
-	loadingManager.itemEnd(label);
-	// debugger; // Starts debugger in Chrome
+	// debugger; // Starts debugger in Chrome/Fox
 	return obj;
 }

@@ -4,16 +4,18 @@ var disableSound = true;
 var musicControl;
 var musicUrl = 'res/jam.mp3';
 var soundVolume = disableSound ? 0 : 100;
-function init() {
-	if (Detector.webgl) {
-		renderer = new THREE.WebGLRenderer({antialias:false,});
-		renderer.autoClearColor = 0x000000;
-		renderer.autoClear = true;
-	} else {
-		Detector.addGetWebGLMessage();
-		return true;
-	}
-	loadingManager = new THREE.LoadingManager(
+var _context = {
+	_actions: [],
+	action: function(actionObject) {
+		_context.loadingManager.itemStart(actionObject.label);
+		_context._actions.push(actionObject);
+		actionObject.ctx = _context;
+		_context.loadingManager.itemEnd(actionObject.label);
+		return actionObject;
+		}
+};
+function createCubeParty(setupTimeline) {
+	_context.loadingManager = new THREE.LoadingManager(
 		function() { // onLoad
 			console.log('All resources loaded, ready to rock \\m/');
 			loadingOn = false; 
@@ -25,37 +27,59 @@ function init() {
 			console.error('Failed to load resources');
 		}
 	);
-	loadingManager.itemStart('init');
-	scene = new THREE.Scene();
-	camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 10000);
-	stats = new Stats();
+	if (Detector.webgl) {
+		var renderer = new THREE.WebGLRenderer({antialias:false,});
+		renderer.autoClearColor = 0x000000;
+		renderer.autoClear = true;
+	} else {
+		Detector.addGetWebGLMessage();
+		console.error('failed to load webgl');
+		return false;
+	}
+	var stats = new Stats();
+	var camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 10000);
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.getElementById('container').appendChild(renderer.domElement);
+	var rootScene = new THREE.Scene();
+	var tlMain = new TimelineLite({
+		paused: true,
+		useFrames: false,
+	});	
+	// Initialize loading animation
+	init(rootScene, _context.loadingManager, stats, renderer, camera, tlMain);
 	// put a camera in the scene
 	camera.position.set(0, 0, 1500);
-	camera.lookAt(scene.position);
-	scene.add(camera);
+	camera.lookAt(rootScene.position);
 	THREEx.WindowResize.bind(renderer, camera);
+	rootScene.add(camera);
+	setupTimeline(_context, rootScene, tlMain);
+}
+function init(rootScene, lm, stats, renderer, camera, tlMain) {
+	lm.itemStart('init');
 	stats.domElement.style.position = 'absolute';
 	stats.domElement.style.left = '0px';
 	stats.domElement.style.top = '0px';
 	document.body.appendChild( stats.domElement );
-	tlMain = new TimelineLite({
-		paused: true,
-		useFrames: false,
-		});
-	loadingManager.itemStart('loadingAnim');
+	lm.itemStart('loadingAnim');
 	var LoadingAnim = createLoadingAnim({
-		onCompleted:startShow,
+		onCompleted:function() { startShow(tlMain); },
+		scene: rootScene,
 		get loading() { return loadingOn; }
 	});
-	animate();
-	createScene();
-	loadingManager.itemEnd('init');
+	soundManager.setup({
+		url: '',
+		onready: function() {
+			soundManagerReady();
+		},
+			preferFlash: false,
+			debugMode: false,
+		});
+	animate(renderer, rootScene, camera, stats);
+	lm.itemEnd('init');
 }
 function soundManagerReady() {
-	loadingManager.itemEnd('SoundManager');
-	loadingManager.itemStart(musicUrl);
+	_context.loadingManager.itemEnd('SoundManager');
+	_context.loadingManager.itemStart(musicUrl);
 	if (!soundManager.canPlayURL(musicUrl)) {
 		console.error('Music format error on ' + musicUrl);
 	}
@@ -69,53 +93,24 @@ function soundManagerReady() {
 }
 function musicReady() {
 	console.log('Music ready', musicControl);
-	loadingManager.itemEnd(musicUrl);
+	_context.loadingManager.itemEnd(musicUrl);
 }
-function createScene() {
-	loadingManager.itemStart('createScene');
-	loadingManager.itemStart('SoundManager');
-	soundManager.setup({
-		url: '',
-		onready: function() {
-			soundManagerReady();
-		},
-		preferFlash: false,
-		debugMode: false,
-	});
-	// Push effects to display list
-	effects.push(createKnot('blueknot', 0xffaffa));
-	effects.push(createKnot('redknot', 0x00fafa));
-	// ---
-	var enabledEffects = effects.filter(function(el,ind,arr) {
-			return el.enabled === true; }
-		);
-	effects = enabledEffects;
-	for (var i = 0; i < effects.length; ++i) {
-		if (effects[i].timeline != null) {
-			tlScenes.push(effects[i].timeline);
-		 };
-	}
-	// Setup control timeline
-	tlMain.set(scene, {visible:true, immediateRender:false}, "0");
-	tlMain.call(function(){tlScenes[0].play()}, null, null, "0");
-	tlMain.call(function(){tlScenes[1].play()}, null, null, "2");
-	tlMain.call(stopShow, null, null, '+=' + tlScenes[1].endTime());
-	loadingManager.itemEnd('createScene');
-}
-function startShow() {
-	loadingManager.itemEnd('loadingAnim');
-	loadingManager.itemEnd('initialization...');
+function startShow(tl) {
+	_context.loadingManager.itemEnd('loadingAnim');
+	_context.loadingManager.itemEnd('initialization...');
 	musicControl.play();
-	tlMain.play(0);
+	tl.play(0);
 	console.log('Rock on!');
 }
-function stopShow() {
+function stopShow(tl) {
 	musicControl.stop();
-	tlMain.stop
+	tl.stop();
 	console.log('Thank you for watching...');
 }
-function animate(timestamp) {
-	requestAnimationFrame(animate); // Tries to animate@60 fps
+function animate(renderer, scene, camera, stats) {
+	requestAnimationFrame(function animateCb() {
+		animate(renderer, scene, camera, stats);
+		}); // Tries to animate@60 fps
 	renderer.render(scene, camera);
 	stats.update(); // Comment this on release
 }
