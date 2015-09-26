@@ -2,7 +2,6 @@
 var loadingOn = true;
 var disableSound = true;
 var musicControl;
-var musicUrl = 'res/jam.mp3';
 var soundVolume = disableSound ? 0 : 100;
 var _context = {
 	_actions: [],
@@ -12,7 +11,7 @@ var _context = {
 		actionObject.ctx = _context;
 		_context.loadingManager.itemEnd(actionObject.label);
 		return actionObject;
-		}
+		},
 };
 function createCubeParty(setupTimeline) {
 	_context.loadingManager = new THREE.LoadingManager(
@@ -27,6 +26,7 @@ function createCubeParty(setupTimeline) {
 			console.error('Failed to load resources');
 		}
 	);
+	_context.loadingManager.itemStart('init');
 	if (Detector.webgl) {
 		var renderer = new THREE.WebGLRenderer({antialias:false,});
 		renderer.autoClearColor = 0x000000;
@@ -53,14 +53,13 @@ function createCubeParty(setupTimeline) {
 	THREEx.WindowResize.bind(renderer, camera);
 	rootScene.add(camera);
 	setupTimeline(_context, rootScene, tlMain);
+	_context.loadingManager.itemEnd('init');
 }
 function init(rootScene, lm, stats, renderer, camera, tlMain) {
-	lm.itemStart('init');
 	stats.domElement.style.position = 'absolute';
 	stats.domElement.style.left = '0px';
 	stats.domElement.style.top = '0px';
 	document.body.appendChild( stats.domElement );
-	lm.itemStart('loadingAnim');
 	var LoadingAnim = createLoadingAnim({
 		onCompleted:function() { startShow(tlMain); },
 		scene: rootScene,
@@ -75,16 +74,15 @@ function init(rootScene, lm, stats, renderer, camera, tlMain) {
 			debugMode: false,
 		});
 	animate(renderer, rootScene, camera, stats);
-	lm.itemEnd('init');
 }
 function soundManagerReady() {
 	_context.loadingManager.itemEnd('SoundManager');
-	_context.loadingManager.itemStart(musicUrl);
-	if (!soundManager.canPlayURL(musicUrl)) {
-		console.error('Music format error on ' + musicUrl);
+	_context.loadingManager.itemStart(_context.audio);
+	if (!soundManager.canPlayURL(_context.audio)) {
+		console.error('Music format error on ' + _context.audio);
 	}
 	musicControl = soundManager.createSound({
-		url: musicUrl,
+		url: _context.audio,
 		volume: soundVolume,
 		autoLoad: true,
 		autoPlay: false,
@@ -97,7 +95,6 @@ function musicReady() {
 }
 function startShow(tl) {
 	_context.loadingManager.itemEnd('loadingAnim');
-	_context.loadingManager.itemEnd('initialization...');
 	musicControl.play();
 	tl.play(0);
 	console.log('Rock on!');

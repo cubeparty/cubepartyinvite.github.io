@@ -11,7 +11,7 @@ fork & modify
 
 Create function based on knot.js, load it on html and push to effects with _enabled_ flag set true. Modify the control timeline to fit your needs.
 
-TBD more configuration options so that forking would not be needed.
+TBD more configuration options so that forking/stabbing would not be needed. CubeParty html file is the main configuration point for own products. Add you own scripts to be loaded and modify the createCubeParty function to include your own actions and timings. 
 
 Have Fun.
 
