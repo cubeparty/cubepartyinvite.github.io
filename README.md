@@ -9,7 +9,7 @@ Timeline support hierarcial timelines but this version uses explicit timeline co
 # How to use
 fork & modify
 
-Create function based on knot.js, load it on html and push to effects with enabled flag set true. Modify the control timeline to fit you needs.
+Create function based on knot.js, load it on html and push to effects with _enabled_ flag set true. Modify the control timeline to fit your needs.
 
 TBD more configuration options so that forking would not be needed.
 
