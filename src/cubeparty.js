@@ -1,7 +1,6 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
 var loadingOn = true;
 var disableSound = true;
-var musicControl;
 var soundVolume = disableSound ? 0 : 100;
 var _context = {
 	_actions: [],
@@ -11,7 +10,7 @@ var _context = {
 		actionObject.ctx = _context;
 		_context.loadingManager.itemEnd(actionObject.label);
 		return actionObject;
-		},
+	},
 };
 function createCubeParty(setupTimeline) {
 	_context.loadingManager = new THREE.LoadingManager(
@@ -81,12 +80,15 @@ function soundManagerReady() {
 	if (!soundManager.canPlayURL(_context.audio)) {
 		console.error('Music format error on ' + _context.audio);
 	}
-	musicControl = soundManager.createSound({
+	_context.musicControl = soundManager.createSound({
 		url: _context.audio,
 		volume: soundVolume,
 		autoLoad: true,
 		autoPlay: false,
-		onLoad: musicReady,
+		onLoad: function() {
+			musicReady();
+		},
+		
 	});
 }
 function musicReady() {
@@ -95,12 +97,12 @@ function musicReady() {
 }
 function startShow(tl) {
 	_context.loadingManager.itemEnd('loadingAnim');
-	musicControl.play();
+	_context.musicControl.play();
 	tl.play(0);
 	console.log('Rock on!');
 }
 function stopShow(tl) {
-	musicControl.stop();
+	_context.musicControl.stop();
 	tl.stop();
 	console.log('Thank you for watching...');
 }
