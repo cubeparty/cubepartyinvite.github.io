@@ -65,20 +65,22 @@
 <body>
     <div id="container"></div>
 	<script type="text/javascript">
-		createCubeParty(function(ctx, scn, tl) {
+		var disableSound = true;
+		createCubeParty(function(action, scn, tl, audio) {
 			//debugger;
-			ctx.audio = 'res/jam.mp3';
+			audio.url = 'res/jam.mp3';
+			audio.soundVolume = disableSound ? 0 : 100;
 			var tls = [];
 			[
-				ctx.action(createKnot('redknot', 0x00fafa)),
-				ctx.action(createKnot('blueknot', 0xffaffa)),
+				action(createKnot('redknot', 0x00fafa)),
+				action(createKnot('blueknot', 0xffaffa)),
 			].filter(function(e) {
 				return e.enabled;
 			}).forEach(function(e) {
 				scn.add(e.rootObject);
 				tls.push(e.timeline);
 			});
-			tl.call(function() {tls[0].play()}, null, null, "0");
+			tl.call(function() {tls[0].play()}, null, null, "0.001");
 			tl.call(function() {tls[1].play()}, null, null, "2");
 			tl.call(function() {stopShow(tl);}, null, null, '+=' + tls[1].endTime());
 		});

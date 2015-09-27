@@ -14,9 +14,10 @@ function createLoadingAnim(params, loading) {
 	obj.showCb = function() {
 		console.log('Show loading animation');
 		params.scene.add(glowCylinder.object3d);
+		obj.showCb = undefined; // Show only once onStart
 	}
 	obj.restartCb = function() {
-		if (loading === true) {
+		if (params.loading === true) {
 			obj.timeline.seek('startcycle');
 		} else {
 			obj.hideCb();

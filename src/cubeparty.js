@@ -1,9 +1,28 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
-var loadingOn = true;
-var disableSound = true;
-var soundVolume = disableSound ? 0 : 100;
 var _context = {
 	_actions: [],
+	loadingManager: function() {
+		//debugger;
+		var lm = new THREE.LoadingManager(
+			function() { // onLoad
+				console.log('All resources loaded, ready to rock \\m/');
+				_context.loadingOn = false; 
+			},
+			function (item, loaded, total) { // onProgress
+				console.log('Completed ' + item, loaded + '/' + total);
+			},
+			function () { // onError
+				console.error('Failed to load resources');
+			}
+		);
+		lm.itemStart('Initialization');
+		return lm;
+	}(),
+	controlTimeline: new TimelineLite({
+		paused: true,
+		useFrames: false,
+		immetiateRender: false,
+	}),
 	action: function(actionObject) {
 		_context.loadingManager.itemStart(actionObject.label);
 		_context._actions.push(actionObject);
@@ -11,21 +30,10 @@ var _context = {
 		_context.loadingManager.itemEnd(actionObject.label);
 		return actionObject;
 	},
+	loadingOn: true,
+	soundVolume: 0,
 };
 function createCubeParty(setupTimeline) {
-	_context.loadingManager = new THREE.LoadingManager(
-		function() { // onLoad
-			console.log('All resources loaded, ready to rock \\m/');
-			loadingOn = false; 
-		},
-		function (item, loaded, total) { // onProgress
-			console.log('Completed ' + item, loaded + '/' + total);
-		},
-		function () { // onError
-			console.error('Failed to load resources');
-		}
-	);
-	_context.loadingManager.itemStart('init');
 	if (Detector.webgl) {
 		var renderer = new THREE.WebGLRenderer({antialias:false,});
 		renderer.autoClearColor = 0x000000;
@@ -40,29 +48,31 @@ function createCubeParty(setupTimeline) {
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.getElementById('container').appendChild(renderer.domElement);
 	var rootScene = new THREE.Scene();
-	var tlMain = new TimelineLite({
-		paused: true,
-		useFrames: false,
-	});	
 	// Initialize loading animation
-	init(rootScene, _context.loadingManager, stats, renderer, camera, tlMain);
+	init(rootScene, stats, renderer, camera);
 	// put a camera in the scene
 	camera.position.set(0, 0, 1500);
 	camera.lookAt(rootScene.position);
 	THREEx.WindowResize.bind(renderer, camera);
 	rootScene.add(camera);
-	setupTimeline(_context, rootScene, tlMain);
-	_context.loadingManager.itemEnd('init');
+	setupTimeline(_context.action, rootScene, _context.controlTimeline, { // audio
+		set url(u) { _context.audioUrl = u; },
+		set soundVolume(v) { _context.soundVolume = v; }
+		});
 }
-function init(rootScene, lm, stats, renderer, camera, tlMain) {
-	stats.domElement.style.position = 'absolute';
-	stats.domElement.style.left = '0px';
-	stats.domElement.style.top = '0px';
-	document.body.appendChild( stats.domElement );
+function init(rootScene, stats, renderer, camera) {
+	if (stats) {
+		stats.domElement.style.position = 'absolute';
+		stats.domElement.style.left = '0px';
+		stats.domElement.style.top = '0px';
+		document.body.appendChild( stats.domElement );
+	}
 	var LoadingAnim = createLoadingAnim({
-		onCompleted:function() { startShow(tlMain); },
-		scene: rootScene,
-		get loading() { return loadingOn; }
+		onCompleted:function() {
+			startShow();
+		},
+		scene: rootScene, // Using same scene for all
+		get loading() { return _context.loadingOn; }
 	});
 	soundManager.setup({
 		url: '',
@@ -75,35 +85,31 @@ function init(rootScene, lm, stats, renderer, camera, tlMain) {
 	animate(renderer, rootScene, camera, stats);
 }
 function soundManagerReady() {
-	_context.loadingManager.itemEnd('SoundManager');
-	_context.loadingManager.itemStart(_context.audio);
-	if (!soundManager.canPlayURL(_context.audio)) {
-		console.error('Music format error on ' + _context.audio);
+	if (!soundManager.canPlayURL(_context.audioUrl)) {
+		console.error('Music format error on ' + _context.audioUrl);
 	}
 	_context.musicControl = soundManager.createSound({
-		url: _context.audio,
-		volume: soundVolume,
+		url: _context.audioUrl,
+		volume: _context.soundVolume,
 		autoLoad: true,
 		autoPlay: false,
-		onLoad: function() {
+		onload: function() {
 			musicReady();
 		},
 		
 	});
 }
 function musicReady() {
-	console.log('Music ready', musicControl);
-	_context.loadingManager.itemEnd(musicUrl);
+	_context.loadingManager.itemEnd('Initialization');
 }
-function startShow(tl) {
-	_context.loadingManager.itemEnd('loadingAnim');
+function startShow() {
 	_context.musicControl.play();
-	tl.play(0);
+	_context.controlTimeline.play(0);
 	console.log('Rock on!');
 }
 function stopShow(tl) {
 	_context.musicControl.stop();
-	tl.stop();
+	_context.controlTimeline.stop();
 	console.log('Thank you for watching...');
 }
 function animate(renderer, scene, camera, stats) {
