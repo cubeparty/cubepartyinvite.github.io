@@ -1,17 +1,15 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
 function createKnot(label, argColor) {
-	// Setup objects for the return.
-	createKnot.enabled = true;
 	var geometry = new THREE.TorusKnotGeometry(100, 100, 100, 60, Math.PI * 4);
 	var materialTorus = new THREE.MeshPhongMaterial( { color: argColor, specular: 0xfa0000, emissive: 0x0a0a00, shininess: 10 } );
 	var torusKnot = new THREE.Mesh(geometry, materialTorus);
 	var directionalLight = new THREE.DirectionalLight(0xffaffa);
-	// Object that will be returned.
+	// Action Object that will be returned.
 	var obj = {};
 	obj.label = label,
 	obj.rootObject = new THREE.Object3D();
 	obj.rootObject.add(torusKnot);
-	obj.enabled = createKnot.enabled;
+	obj.enabled = true; // Development time disabling/enabling
 	obj.timeline = new TimelineLite({
 			paused:true,
 			callbackScope: obj,

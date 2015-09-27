@@ -11,7 +11,10 @@ fork & modify
 
 Create function based on knot.js, load it on html and push to effects with _enabled_ flag set true. Modify the control timeline to fit your needs.
 
-TBD more configuration options so that forking/stabbing would not be needed. CubeParty html file is the main configuration point for own products. Add you own scripts to be loaded and modify the createCubeParty function to include your own actions and timings. 
+TBD more configuration options so that forking/stabbing would not be needed. CubeParty html file is the main configuration point for own products. Add you own scripts to be loaded and modify the createCubeParty function to include your own actions and timings. Master branch is the development edge and doesn't give guarantees to backwards compatibility. There are tags that provide more stable release candidates. Tag minor version number states that there are changes which probably breaks the compatibility and needs merging. Patch number should be quite small fix and hopefully doesn't break anything bigger. Major release number increases when quality and design reaches stable point.
+
+# tl;dr;
+So alpha, very edge. wow.
 
 Have Fun.
 
