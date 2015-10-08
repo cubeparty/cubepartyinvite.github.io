@@ -74,6 +74,10 @@ function init(rootScene, stats, renderer, camera) {
 		scene: rootScene, // Using same scene for all
 		get loading() { return _context.loadingOn; }
 	});
+	LoadingAnim.then(function(playfun) {
+		console.log('Loading animation ready to play..');
+		playfun();
+	});
 	soundManager.setup({
 		url: '',
 		onready: function() {
