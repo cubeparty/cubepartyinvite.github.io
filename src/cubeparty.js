@@ -63,18 +63,25 @@ function createCubeParty(setupTimeline) {
 	rootScene.add(camera);
 	var setupTimelineParams1 = [_context.action, { // audio
 		set url(u) { _context.audioUrl = u; },
-		set setSoundVolume(v) { _context.soundVolume = v; },
-		get soundVolume() { return _context.soundVolume; }
 		}];
-	var setupTimelineParams2 = {"scene":rootScene, "ctl":_context.controlTimeline, "actors":_context._actions, "audio":{ 
+	var setupTimelineParams2 = {"scene":rootScene, "ctl":_context.controlTimeline, /*"actors":_context._actions,*/
+		"controls": {
+			"startShow":function() { _context.loadingOn = false; },
+			"stopShow":stopShow
+		},
+		"audio":{
 		set setSoundVolume(v) { _context.soundVolume = v; },
 		get soundVolume() { return _context.soundVolume; }
 		}};
 	setupTimeline.apply(null, setupTimelineParams1);
 
 return new Promise(function(resolve, reject) {
-	console.log(setupTimelineParams2);
-	_context.notifyLoadingReady.push(function() { resolve(setupTimelineParams2); });
+	_context.notifyLoadingReady.push(function() {
+		// Shorthands for actors in context
+		Object.keys(_context._actions).forEach(function(k) {
+			setupTimelineParams2[k] = _context._actions[k];
+		});
+		resolve(setupTimelineParams2); });
 });
 }
 function init(rootScene, stats, renderer, camera) {
@@ -128,7 +135,7 @@ function startShow() {
 	_context.controlTimeline.play(0);
 	console.log('Rock on!');
 }
-function stopShow(tl) {
+function stopShow() {
 	_context.musicControl.stop();
 	_context.controlTimeline.stop();
 	console.log('Thank you for watching...');
