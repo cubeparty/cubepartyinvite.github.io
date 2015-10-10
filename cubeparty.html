@@ -70,8 +70,8 @@
 			//debugger;
 			audio.url = 'res/jam.mp3';
 			audio.setSoundVolume = disableSound ? 0 : 100;
-			createActor(createKnot('redknot', 0x00fafa)),
-			createActor(createKnot('blueknot', 0xffaffa));
+			createActor(createKnot, 'redknot', [0x00fafa]),
+			createActor(createKnot, 'blueknot', [0xffaffa]);
 			}).then(function(ctx) { // scene, ctl, actors, audio 
 				ctx.scene.add(ctx.actors['blueknot'].rootObject);
 				ctx.scene.add(ctx.actors['redknot'].rootObject);

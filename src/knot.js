@@ -4,7 +4,7 @@ function createKnot(label, argColor) {
 	var materialTorus = new THREE.MeshPhongMaterial( { color: argColor, specular: 0xfa0000, emissive: 0x0a0a00, shininess: 10 } );
 	var torusKnot = new THREE.Mesh(geometry, materialTorus);
 	var directionalLight = new THREE.DirectionalLight(0xffaffa);
-	// Action Object that will be returned.
+	// Actor object
 	var obj = {};
 	obj.label = label,
 	obj.rootObject = new THREE.Object3D();
@@ -40,5 +40,7 @@ function createKnot(label, argColor) {
 	obj.timeline.to(torusKnot.rotation, 2.0, {x: 6.28, y: 6.28});
 	obj.timeline.set(obj.rootObject, {visible:false});
 	// debugger; // Starts debugger in Chrome/Fox
-	return obj;
+	return new Promise(function(resolve, reject) {
+		resolve(obj);
+	});
 }

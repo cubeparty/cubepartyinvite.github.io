@@ -24,12 +24,16 @@ var _context = {
 		useFrames: false,
 		immetiateRender: false,
 	}),
-	action: function(actionObject) {
-		_context.loadingManager.itemStart(actionObject.label);
-		_context._actions[actionObject.label] = actionObject;
-		//actionObject.ctx = _context;
-		_context.loadingManager.itemEnd(actionObject.label);
-		return actionObject;
+	action: function(fun, label, params) {
+		_context.loadingManager.itemStart(label);
+		fun.apply(null, [label].concat(params)).then(function(obj) {
+			_context._actions[label] = obj;
+			_context.loadingManager.itemEnd(label);
+			if ((/^Anssi/).test(label)) { // Shibboleth
+				console.log('Context attached to object');
+				obj.ctx = _context;
+			}
+		});
 	},
 	loadingOn: true,
 	notifyLoadingReady:[],
