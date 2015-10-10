@@ -7,6 +7,7 @@ var _context = {
 			function() { // onLoad
 				console.log('All resources loaded, ready to rock \\m/');
 				_context.loadingOn = false; 
+				_context.notifyLoadingReady.forEach(function(f) { f(); });
 			},
 			function (item, loaded, total) { // onProgress
 				console.log('Completed ' + item, loaded + '/' + total);
@@ -25,12 +26,13 @@ var _context = {
 	}),
 	action: function(actionObject) {
 		_context.loadingManager.itemStart(actionObject.label);
-		_context._actions.push(actionObject);
-		actionObject.ctx = _context;
+		_context._actions[actionObject.label] = actionObject;
+		//actionObject.ctx = _context;
 		_context.loadingManager.itemEnd(actionObject.label);
 		return actionObject;
 	},
 	loadingOn: true,
+	notifyLoadingReady:[],
 	soundVolume: 0,
 };
 function createCubeParty(setupTimeline) {
@@ -55,10 +57,21 @@ function createCubeParty(setupTimeline) {
 	camera.lookAt(rootScene.position);
 	THREEx.WindowResize.bind(renderer, camera);
 	rootScene.add(camera);
-	setupTimeline(_context.action, rootScene, _context.controlTimeline, { // audio
+	var setupTimelineParams1 = [_context.action, { // audio
 		set url(u) { _context.audioUrl = u; },
-		set soundVolume(v) { _context.soundVolume = v; }
-		});
+		set setSoundVolume(v) { _context.soundVolume = v; },
+		get soundVolume() { return _context.soundVolume; }
+		}];
+	var setupTimelineParams2 = {"scene":rootScene, "ctl":_context.controlTimeline, "actors":_context._actions, "audio":{ 
+		set setSoundVolume(v) { _context.soundVolume = v; },
+		get soundVolume() { return _context.soundVolume; }
+		}};
+	setupTimeline.apply(null, setupTimelineParams1);
+
+return new Promise(function(resolve, reject) {
+	console.log(setupTimelineParams2);
+	_context.notifyLoadingReady.push(function() { resolve(setupTimelineParams2); });
+});
 }
 function init(rootScene, stats, renderer, camera) {
 	if (stats) {
