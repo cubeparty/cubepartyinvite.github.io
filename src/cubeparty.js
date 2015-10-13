@@ -49,7 +49,8 @@ function createCubeParty(setupTimeline) {
 		console.error('failed to load webgl');
 		return false;
 	}
-	var stats = new Stats();
+	var stats;
+	//stats = new Stats(); // Comment on release
 	var camera = new THREE.PerspectiveCamera(30, window.innerWidth / window.innerHeight, 1, 10000);
 	renderer.setSize( window.innerWidth, window.innerHeight );
 	document.getElementById('container').appendChild(renderer.domElement);
@@ -145,5 +146,5 @@ function animate(renderer, scene, camera, stats) {
 		animate(renderer, scene, camera, stats);
 		}); // Tries to animate@60 fps
 	renderer.render(scene, camera);
-	stats.update(); // Comment this on release
+	stats && stats.update(); // Comment this on release
 }
