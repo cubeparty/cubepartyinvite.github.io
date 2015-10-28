@@ -8,14 +8,9 @@ fork & modify
 
 Create function based on knot.js, load it on html and create Actor. Modify the control timeline to fit your needs.
 
-CubeParty html file is the main configuration point for own productions. Add you own scripts to be loaded. 
+CubeParty html file is the main configuration point for own productions. Add you own scripts to be loaded.
 
-Master branch is the development edge and doesn't give guarantees to backwards compatibility. There are tags that provide more stable release candidates. Minor version number means that there are changes which probably breaks the compatibility and needs merging. Patch number should be quite small fix and hopefully doesn't break anything bigger.
-
-# tl;dr;
-So alpha, very edge. wow.
-Major release number increases when quality and design reaches stable point.
-Version tagged with v0.3+ can be considered v1.0 release candidate and more complete in design wise. 
+There are tags that provide more stable release candidates. Minor version number means that there are changes which probably breaks the compatibility and needs merging. Patch number should be quite small fix and hopefully doesn't break anything bigger.
 
 Have Fun.
 
