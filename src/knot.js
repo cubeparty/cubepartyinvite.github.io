@@ -13,7 +13,7 @@ function knot(label, argColor) {
 	obj.timeline = new TimelineLite({
 			paused:true,
 			callbackScope: obj,
-//			updateCallback: function() { obj.updateCb(); },
+//			onUpdate: function() { obj.updateCb(); },
 			get onComplete() { return obj.hideCb; },
 			get onStart() { return obj.showCb; },
 		});
