@@ -24,6 +24,8 @@ var _context = {
 		useFrames: false,
 		immetiateRender: false,
 	}),
+	composer: null,
+	enablePostEffect: false,
 	action: function(fun, label, params) {
 		_context.loadingManager.itemStart(label);
 		fun.apply(null, [label].concat(params)).then(function(obj) {
@@ -73,8 +75,13 @@ function createCubeParty(setupTimeline) {
 		},
 		"audio":{
 		set setSoundVolume(v) { _context.soundVolume = v; },
-		get soundVolume() { return _context.soundVolume; }
-		}};
+		get soundVolume() { return _context.musicControl.volume; }
+		},
+		"postprocessing": {
+			set enable(v) { _context.postprocessing = v; },
+			get isEnabled() { return _context.postprocessing; }
+		}
+		};
 	setupTimeline.apply(null, setupTimelineParams1);
 
 return new Promise(function(resolve, reject) {
@@ -112,6 +119,21 @@ function init(rootScene, stats, renderer, camera) {
 			preferFlash: false,
 			debugMode: false,
 		});
+	// postprocessing.
+	_context.composer = new THREE.EffectComposer(renderer);
+	var pass = new THREE.RenderPass(rootScene, camera);
+	_context.composer.addPass(pass);
+	pass = new THREE.ShaderPass(THREE.DotScreenShader);
+	pass.uniforms[ 'scale' ].value = 3;
+	_context.composer.addPass(pass);
+	pass = new THREE.ShaderPass(THREE.RGBShiftShader);
+	//pass.uniforms[ 'amount' ].value = 0.005;
+	_context.controlTimeline.to(pass.uniforms[ 'amount' ], 120, {value: 0.01}, 0);
+	console.log(pass.uniforms[ 'amount' ].value);
+	//pass.uniforms[ 'amount' ].value = 0.01;
+	_context.composer.addPass(pass);
+	pass.renderToScreen = true; // Mandatory for last
+	// Animate
 	animate(renderer, rootScene, camera, stats);
 }
 function soundManagerReady() {
@@ -124,6 +146,7 @@ function soundManagerReady() {
 		autoLoad: true,
 		autoPlay: false,
 		onload: function() {
+			console.log('music ready');
 			musicReady();
 		},
 		
@@ -133,6 +156,7 @@ function musicReady() {
 	_context.loadingManager.itemEnd('Initialization');
 }
 function startShow() {
+	console.log(_context.musicControl.volume);
 	_context.musicControl.play();
 	_context.controlTimeline.play(0);
 	console.log('Rock on!');
@@ -146,6 +170,11 @@ function animate(renderer, scene, camera, stats) {
 	requestAnimationFrame(function animateCb() {
 		animate(renderer, scene, camera, stats);
 		}); // Tries to animate@60 fps
-	renderer.render(scene, camera);
+	// Test if postprocessing is enabled
+	if (_context.postprocessing === true) {
+		_context.composer.render(scene, camera);
+	} else {
+		renderer.render(scene, camera);
+	}
 	stats && stats.update(); // Comment this on release
 }

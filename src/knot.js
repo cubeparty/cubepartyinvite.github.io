@@ -13,7 +13,7 @@ function knot(label, argColor) {
 	obj.timeline = new TimelineLite({
 			paused:true,
 			callbackScope: obj,
-//			onUpdate: function() { obj.updateCb(); },
+			onUpdate: function() { obj.updateCb(); },
 			get onComplete() { return obj.hideCb; },
 			get onStart() { return obj.showCb; },
 		});
@@ -34,10 +34,13 @@ function knot(label, argColor) {
 		}
 	}
 	obj.updateCb = function() {
-		// torusKnot.rotation.y += 0.1;
+		 torusKnot.position.x = Math.sin(obj.timeline.time()) * 200 ;
+		 torusKnot.position.y = Math.cos(obj.timeline.time()) * 4 ;
 		// torusKnot.rotation.x += 0.1;
 	}
-	obj.timeline.to(torusKnot.rotation, 2.0, {x: 6.28, y: 6.28});
+	obj.timeline.to(torusKnot.rotation, 15.0, {x: 3.14*10, y: 3.14*5}, 0);
+	obj.timeline.to(torusKnot.position, 10.0, {x: 314*4, y: 3.14*10,}, 5);
+	obj.timeline.to(torusKnot.position, 5.0, {z: 314*2}, 10);
 	obj.timeline.set(obj.rootObject, {visible:false});
 	// debugger; // Starts debugger in Chrome/Fox
 	return new Promise(function(resolve, reject) {

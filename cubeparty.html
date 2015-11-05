@@ -14,15 +14,75 @@
 		<script src='lib/threex.atmospherematerialdatgui.js'></script>
 		<script src='lib/threex.dilategeometry.js'></script>
 		<script src='lib/threex.geometricglowmesh.js'></script>
-		<script src="lib/soundmanager2-nodebug-jsmin.js"></script>
-		<script src="lib/Stats.js"></script>
+		<script src='lib/soundmanager2-nodebug-jsmin.js'></script>
+		<script src='lib/Stats.js'></script>
+		<script src='lib/shaders/CopyShader.js'></script>
+		<script src='lib//shaders/DotScreenShader.js'></script>
+		<script src='lib/shaders/RGBShiftShader.js'></script>
+		<script src='lib/postprocessing/EffectComposer.js'></script>
+		<script src='lib/postprocessing/RenderPass.js'></script>
+		<script src='lib/postprocessing/MaskPass.js'></script>
+		<script src='lib/postprocessing/ShaderPass.js'></script>
 		<script src='lib/greensock-js/TimelineLite.min.js'></script>
 		<script src='lib/greensock-js/TweenLite.min.js'></script>
 		<!-- src -->
 		<script src="src/cubeparty.js"></script>
 		<script src="src/loadinganim.js"></script>
 		<script src="src/knot.js"></script>
-		<!-- css -->
+		<script src="src/still.js"></script>
+		<script src="src/fill.js"></script>
+<!------ shader ------>
+<script id="vertexShader" type="x-shader/x-vertex">
+uniform float amplitude;
+attribute float displacement;
+varying vec3 vNormal;
+varying vec2 vUv;
+void main() {
+	vUv = uv;
+	vNormal = normal;
+
+	// multiply our displacement by
+	// the amplitude. The amp will
+	// get animated so we'll have
+	// animated displacement
+	vec3 newPosition = position + normal * vec3(displacement * amplitude);
+	gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+}
+</script>
+<script id="fragmentShader" type="x-shader/x-fragment">
+precision highp float;
+varying vec2 vUv;
+uniform float color;
+void main(void) {
+    gl_FragColor = vec4(dot(vUv.x, vUv.y) * color);
+}
+</script>
+<script id="fillFragmentShader" type="x-shader/x-fragment">
+precision highp float;
+varying vec2 vUv;
+uniform float color;
+void main(void) {
+    gl_FragColor = vec4(dot(vUv.x, vUv.y) * color);
+}
+</script>
+<script id="fillVertexShader" type="x-shader/x-vertex">
+uniform float amplitude;
+attribute float displacement;
+varying vec3 vNormal;
+varying vec2 vUv;
+void main() {
+	vUv = uv;
+	vNormal = normal;
+
+	// multiply our displacement by
+	// the amplitude. The amp will
+	// get animated so we'll have
+	// animated displacement
+	vec3 newPosition = position + normal * vec3(displacement * amplitude);
+	gl_Position = projectionMatrix * modelViewMatrix * vec4(newPosition, 1.0);
+}
+</script>
+<!------ css ------>
 		<style type="text/css">
 		html {
 			cursor: none;
@@ -65,23 +125,50 @@
 <body>
     <div id="container"></div>
 	<script type="text/javascript">
-		var disableSound = true;
+console.log(`string text line 1
+string text line 2`);
+		var disableSound = false;
 		createCubeParty(function(createActor, audio) {
 			// Setup audio url. Could be also actor itself
-			audio.url = 'res/jam.mp3';
+			audio.url = 'res/jusa_01.mp3';
 			audio.volume = disableSound ? 0 : 100;
 			// Create actors. Second argument, the Label is mandatory to reference the actor in stage setup. Dont' use reserved words shown in then(..) arguments please.
 			// Knock knock.. who's there. Actor. Actor who? Actor who's going to twist your audio-visual nerves. When? Wait i get out of sauna first.
 			createActor(knot, 'redknot', [0x00fafa]),
 			createActor(knot, 'blueknot', [0xffaffa]);
+			createActor(still, 'thanks', ['path']);
+			createActor(fill, 'fill', ['path']);
 			// Actors are created and audio loaded. Next step is to setup stage.
 			}).then(function(ctx) { // scene, ctl, "<actor_labels>+", controls,
 				// Add actor's visuals to Threejs scene tree. Check docs at http://threejs.org/docs/
 				ctx.scene.add(ctx.blueknot.rootObject);
 				ctx.scene.add(ctx.redknot.rootObject);
+				ctx.scene.add(ctx.thanks.rootObject);
+				ctx.scene.add(ctx.fill.rootObject);
 				// Sequnce the actors in control GSAP TimelineLite (ctl). Check docs at http://greensock.com/timelinelite
-				ctx.ctl.call(function() {ctx.redknot.timeline.play()}, null, null, "0.001");
-				ctx.ctl.call(function() {ctx.blueknot.timeline.play()}, null, null, "2");
+				ctx.ctl.call(function() {;
+					ctx.fill.timeline.play();
+				}, null, null, "0.0");
+					
+				ctx.ctl.call(function() {
+					ctx.redknot.timeline.play();
+					}, null, null, "0.001");
+
+				ctx.ctl.call(function() {
+					ctx.postprocessing.enable = false;
+					ctx.thanks.timeline.play();
+					}, null, null, "20");
+
+				ctx.ctl.call(function() {
+					ctx.postprocessing.enable = true;
+					ctx.thanks.timeline.play();
+					}, null, null, "30");
+
+				ctx.ctl.call(function() {;
+					ctx.fill.timeline.play();
+					ctx.blueknot.timeline.play();
+					}, null, null, "60");
+
 				// Explicit stopShow command to stop music and control timeline.
 				ctx.ctl.call(function() {ctx.controls.stopShow();}, null, null, '+=' + ctx.blueknot.timeline.endTime());
 				// Stage is set, start show.
