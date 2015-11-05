@@ -69,13 +69,13 @@
 		createCubeParty(function(createActor, audio) {
 			// Setup audio url. Could be also actor itself
 			audio.url = 'res/jam.mp3';
+			audio.volume = disableSound ? 0 : 100;
 			// Create actors. Second argument, the Label is mandatory to reference the actor in stage setup. Dont' use reserved words shown in then(..) arguments please.
 			// Knock knock.. who's there. Actor. Actor who? Actor who's going to twist your audio-visual nerves. When? Wait i get out of sauna first.
 			createActor(knot, 'redknot', [0x00fafa]),
 			createActor(knot, 'blueknot', [0xffaffa]);
 			// Actors are created and audio loaded. Next step is to setup stage.
-			}).then(function(ctx) { // scene, ctl, "<actor_labels>+", controls, audio
-				ctx.audio.setSoundVolume = disableSound ? 0 : 100;
+			}).then(function(ctx) { // scene, ctl, "<actor_labels>+", controls,
 				// Add actor's visuals to Threejs scene tree. Check docs at http://threejs.org/docs/
 				ctx.scene.add(ctx.blueknot.rootObject);
 				ctx.scene.add(ctx.redknot.rootObject);

@@ -64,6 +64,7 @@ function createCubeParty(setupTimeline) {
 	rootScene.add(camera);
 	var setupTimelineParams1 = [_context.action, { // audio
 		set url(u) { _context.audioUrl = u; },
+		set volume(v) { _context.soundVolume = v; },
 		}];
 	var setupTimelineParams2 = {"scene":rootScene, "ctl":_context.controlTimeline, /*"actors":_context._actions,*/
 		"controls": {
