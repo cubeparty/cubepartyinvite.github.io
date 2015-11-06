@@ -1,5 +1,5 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
-function still(label, file) {
+function cube(label, file) {
 	var unif = {
 		amplitude: {
 			type: 'f',
@@ -8,8 +8,12 @@ function still(label, file) {
 		color: {
 			type: 'f',
 			value: 0.0
-		}
-	};
+		},
+		time: {
+			type: 'f',
+			value: 0.0
+		},
+		};
 	var attrib = {
 		displacement: {
 			type: 'f', // a float
@@ -19,8 +23,8 @@ function still(label, file) {
 	var material = new THREE.ShaderMaterial( {
 		uniforms: unif,
 //		attributes: attrib,
-		vertexShader: document.getElementById('vertexShader').innerHTML,
-		fragmentShader: document.getElementById('fragmentShader').innerHTML,
+		vertexShader: document.getElementById('pillVertexShader').innerHTML,
+		fragmentShader: document.getElementById('pillFragmentShader').innerHTML,
 		needsUpdate: true,
 		side: THREE.DoubleSide
 	});
@@ -28,7 +32,7 @@ function still(label, file) {
 
 
 //buffgeom.addAttribute('position', new THREE.BufferAttribute( vertices, 3 ) );
-	var geometry = new THREE.PlaneGeometry(500, 500, 10);
+	var geometry = new THREE.BoxGeometry(100, 100, 100, 5, 5, 5);
 	geometry = new THREE.BufferGeometry().fromGeometry(geometry, null);
 	var mesh = new THREE.Mesh(geometry, material);
 	console.log(mesh.geometry);
@@ -70,16 +74,20 @@ function still(label, file) {
 		}
 	}
 	obj.updateCb = function() {
-		 unif.color.value = Math.abs(Math.sin(obj.timeline.time()*.5));
-		 unif.amplitude.value = Math.sin(obj.timeline.time()) * 15;
+		 unif.color.value = Math.abs(Math.sin(obj.timeline.time()));
+		 unif.amplitude.value = Math.sin(obj.timeline.time()) * 30;
+		 unif.time.value = obj.timeline.time();
 		// console.log(unif.color.value);
 		// mesh.rotation.x += 0.1;
 	}
-	mesh.position.x = Math.sin(obj.timeline.time()) * 3.0;
-	mesh.position.y = Math.cos(obj.timeline.time() * 0.5);
-	mesh.position.z = Math.sin(obj.timeline.time()) * 50;
+	obj.rootObject.position.x = Math.sin(obj.timeline.time());
+//	mesh.position.y = Math.cos(obj.timeline.time() * 0.5);
+	mesh.position.z = Math.acos(obj.timeline.time() * 10);
+	unif.color.value = Math.acos(obj.timeline.time());
+//	unif.amplitude.value = Math.sin(obj.timeline.time())*10;
 	
-	obj.timeline.to(mesh.rotation, 40.0, {x: 6.28*5, y: 6.28*3}, 0.0);
+	obj.timeline.to(unif.amplitude, 10.0, {value: 6.28*7}, .0);
+	obj.timeline.to(mesh.rotation, 5.0, {x: 6.28*7, y: 6.28*7}, 0.0);
 	obj.timeline.set(obj.rootObject, {visible:false});
 	// debugger; // Starts debugger in Chrome/Fox
 	return new Promise(function(resolve, reject) {

@@ -28,7 +28,7 @@ function fill(label, file) {
 
 
 //buffgeom.addAttribute('position', new THREE.BufferAttribute( vertices, 3 ) );
-	var geometry = new THREE.SphereGeometry(THREE.Vector3(0,0,0), 100);
+	var geometry = new THREE.SphereGeometry(THREE.Vector3(0,0,0), 150);
 	geometry = new THREE.BufferGeometry().fromGeometry(geometry, null);
 	var mesh = new THREE.Mesh(geometry, material);
 	console.log(mesh.geometry);
@@ -70,18 +70,16 @@ function fill(label, file) {
 		}
 	}
 	obj.updateCb = function() {
-		 unif.color.value = Math.abs(Math.sin(obj.timeline.time()*.5));
-		 unif.amplitude.value = Math.sin(obj.timeline.time()) * 10;
+		 unif.color.value = Math.abs(Math.sin(obj.timeline.time()* 1.5));
+		 unif.amplitude.value = Math.sin(obj.timeline.time() * 2) * 10 + 1;
 		// console.log(unif.color.value);
 		// mesh.rotation.x += 0.1;
 	}
 	mesh.position.x = Math.sin(obj.timeline.time())  * 50;
 	mesh.position.y = Math.cos(obj.timeline.time() * 0.5);
-	mesh.position.z = Math.acos(obj.timeline.time() * 200);
+	mesh.position.z = Math.sin(obj.timeline.time()) * 100;
 	
-	obj.timeline.to(mesh.rotation, 180.0, {x: 6.28*10, y: 6.28*10}, 0.0);
-	obj.timeline.to(mesh.position, 20.0, {x: 6.28*10, y: 6.28*10}, 40.0);
-	obj.timeline.to(mesh.position, 200.0, {x: 6.28*10, y: 6.28*10}, 80.0);
+	obj.timeline.to(mesh.rotation, 80.0, {x: 6.28*10, y: 6.28*10}, 0.0);
 	obj.timeline.set(obj.rootObject, {visible:false});
 	// debugger; // Starts debugger in Chrome/Fox
 	return new Promise(function(resolve, reject) {

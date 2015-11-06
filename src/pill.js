@@ -8,8 +8,12 @@ function pill(label, file) {
 		color: {
 			type: 'f',
 			value: 0.0
-		}
-	};
+		},
+		time: {
+			type: 'f',
+			value: 0.0
+		},
+		};
 	var attrib = {
 		displacement: {
 			type: 'f', // a float
@@ -28,7 +32,7 @@ function pill(label, file) {
 
 
 //buffgeom.addAttribute('position', new THREE.BufferAttribute( vertices, 3 ) );
-	var geometry = new THREE.SphereGeometry(THREE.Vector3(0,0,0), 100);
+	var geometry = new THREE.TorusKnotGeometry(100, 100, 100, 60, Math.PI * 4);
 	geometry = new THREE.BufferGeometry().fromGeometry(geometry, null);
 	var mesh = new THREE.Mesh(geometry, material);
 	console.log(mesh.geometry);
@@ -70,18 +74,19 @@ function pill(label, file) {
 		}
 	}
 	obj.updateCb = function() {
-		 unif.color.value = Math.abs(Math.sin(obj.timeline.time()*.5));
-		 unif.amplitude.value = Math.sin(obj.timeline.time()) * 10;
+		 unif.color.value = Math.abs(Math.sin(obj.timeline.time()));
+		 unif.amplitude.value = Math.sin(obj.timeline.time()) * 30;
+		 unif.time.value = obj.timeline.time();
 		// console.log(unif.color.value);
 		// mesh.rotation.x += 0.1;
 	}
-	mesh.position.x = Math.sin(obj.timeline.time())  * 50;
+//	mesh.position.x = Math.sin(obj.timeline.time())  * 500;
 	mesh.position.y = Math.cos(obj.timeline.time() * 0.5);
-	mesh.position.z = Math.acos(obj.timeline.time() * 200);
+	mesh.position.z = Math.acos(obj.timeline.time() * 100) - 40;
+	unif.color.value = Math.acos(obj.timeline.time());
 	
-	obj.timeline.to(mesh.rotation, 180.0, {x: 6.28*10, y: 6.28*10}, 0.0);
-	obj.timeline.to(mesh.position, 20.0, {x: 6.28*10, y: 6.28*10}, 40.0);
-	obj.timeline.to(mesh.position, 200.0, {x: 6.28*10, y: 6.28*10}, 80.0);
+	obj.timeline.to(mesh.rotation, 40.0, {x: 6.28*20, y: 6.28*20}, 0.0);
+	obj.timeline.to(mesh.position, 20.0, {x: 100, y: 10}, 10.0);
 	obj.timeline.set(obj.rootObject, {visible:false});
 	// debugger; // Starts debugger in Chrome/Fox
 	return new Promise(function(resolve, reject) {

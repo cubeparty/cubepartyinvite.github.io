@@ -167,19 +167,11 @@ function stopShow() {
 	_context.controlTimeline.stop();
 	_context._actions.forEach(function(el,ind,arr){el.stop();});
 	_context.exitDemo = true;
+	window.location = "src/credits.txt"
 	console.log('Thank you for watching...');
 }
 function animate(renderer, scene, camera, stats) {
 	requestAnimationFrame(function animateCb() {
-		if (_context.exitDemo) {
-			var c = document.getElementById("container");
-			document.getElementById('container').replaceChild(renderer.domElement, null);
-			var c = document.getElementById("myCanvas");
-			var ctx = c.getContext("2d");
-			ctx.font = "30px Arial";
-			ctx.strokeText("Hello World",10,50);
-			return;
-		}
 		animate(renderer, scene, camera, stats);
 		}); // Tries to animate@60 fps
 	// Test if postprocessing is enabled

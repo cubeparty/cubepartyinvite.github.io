@@ -39,6 +39,7 @@ function knot(label, argColor) {
 		// torusKnot.rotation.x += 0.1;
 	}
 	obj.timeline.to(torusKnot.rotation, 15.0, {x: 3.14*10, y: 3.14*5}, 0);
+	obj.timeline.to(torusKnot.rotation, 15.0, {x: 3.14*20, y: 3.14*5}, 15);
 	obj.timeline.to(torusKnot.position, 10.0, {x: 314*4, y: 3.14*10,}, 5);
 	obj.timeline.to(torusKnot.position, 5.0, {z: 314*2}, 10);
 	obj.timeline.set(obj.rootObject, {visible:false});
