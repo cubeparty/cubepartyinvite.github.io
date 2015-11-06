@@ -1,5 +1,5 @@
 'use strict'; // Distributed under CC-BY-NC-SA license (c) 2015 by Anssi Eteläniemi, aetelani(a)live.com 
-function fill(label, file) {
+function pill(label, file) {
 	var unif = {
 		amplitude: {
 			type: 'f',
@@ -19,8 +19,8 @@ function fill(label, file) {
 	var material = new THREE.ShaderMaterial( {
 		uniforms: unif,
 //		attributes: attrib,
-		vertexShader: document.getElementById('fillVertexShader').innerHTML,
-		fragmentShader: document.getElementById('fillFragmentShader').innerHTML,
+		vertexShader: document.getElementById('pillVertexShader').innerHTML,
+		fragmentShader: document.getElementById('pillFragmentShader').innerHTML,
 		needsUpdate: true,
 		side: THREE.DoubleSide
 	});
