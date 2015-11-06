@@ -75,14 +75,14 @@ function pill(label, file) {
 	}
 	obj.updateCb = function() {
 		 unif.color.value = Math.abs(Math.sin(obj.timeline.time()));
-		 unif.amplitude.value = Math.sin(obj.timeline.time()) * 30;
+		 unif.amplitude.value = Math.sin(obj.timeline.time()) * 10
 		 unif.time.value = obj.timeline.time();
 		// console.log(unif.color.value);
 		// mesh.rotation.x += 0.1;
 	}
 //	mesh.position.x = Math.sin(obj.timeline.time())  * 500;
 	mesh.position.y = Math.cos(obj.timeline.time() * 0.5);
-	mesh.position.z = Math.acos(obj.timeline.time() * 100) - 40;
+	mesh.position.z = Math.acos(obj.timeline.time() * 100);
 	unif.color.value = Math.acos(obj.timeline.time());
 	
 	obj.timeline.to(mesh.rotation, 40.0, {x: 6.28*20, y: 6.28*20}, 0.0);

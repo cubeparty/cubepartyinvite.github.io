@@ -244,7 +244,7 @@ string text line 2`);
 				ctx.ctl.call(function() { ctx.fill.timeline.play(0); }, null, null, flower_start + 40);
 
 				// Explicit stopShow command to stop music and control timeline.
-				ctx.ctl.call(function() {ctx.controls.stopShow();}, null, null, 0 );//'+=' + ctx.blueknot.timeline.endTime());
+				ctx.ctl.call(function() {ctx.controls.stopShow();}, null, null, '+=' + ctx.blueknot.timeline.endTime());
 				// Stage is set, start show.
 				ctx.controls.startShow()
 		});
