@@ -206,10 +206,10 @@ string text line 2`);
 				
 				ctx.ctl.call(function() {
 					ctx.postprocessing.enable = false;
-					ctx.thanks.timeline.play();
+					ctx.thanks.timeline.play(0);
 					}, null, null, "30");
 
-				ctx.ctl.call(function() { ctx.postprocessing.enable = true; }, null, null, "32");
+				ctx.ctl.call(function() { ctx.postprocessing.enable = true; }, null, null, "40");
 /*				ctx.ctl.call(function() {ctx.fill.timeline.play();
 				}, null, null, "11.0");
 
@@ -231,12 +231,12 @@ string text line 2`);
 					ctx.blueknot.timeline.play();
 					}, null, null, "50");
 */
-				var flower_start = 50;
+				var flower_start = 60;
 				ctx.ctl.call(function() {ctx.postprocessing.enable = false;
 				}, null, null, flower_start);
 				ctx.ctl.call(function() { ctx.flower.timeline.play();
 				}, null, null, flower_start);
-				ctx.ctl.call(function() {ctx.postprocessing.enable = true;
+				ctx.ctl.call(function() {ctx.postprocessing.enable = false;
 				}, null, null, flower_start + 15.0);
 				ctx.ctl.call(function() {ctx.postprocessing.enable = true;
 				}, null, null, flower_start + 25.0);
